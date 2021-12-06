@@ -138,6 +138,7 @@ class TrajectoryHandler : public rclcpp::Node
         void printVehiclePosition();
         void sendSetpointPosition(const rclcpp::Time& stamp, const double x, const double y, const double z, const double yaw=0.0);
         void handleLocalPosition(const geometry_msgs::msg::PoseStamped::SharedPtr s);
+        double vehicleGetYaw();
 
         // Mission parameters
         std::shared_ptr<rclcpp::Time> mission_start_receive_time;
@@ -162,6 +163,7 @@ class TrajectoryHandler : public rclcpp::Node
         double end_extra_time;                  // Extra time to give after finishing trajectory
         double location_arrival_epsilon;        // Determine if vehicle is near setpoint
         double ground_threshold;                // Below ground threshold indicates that vehicle has landed
+        double takeoff_duration;                // Time given for takeoff to occur
 
         // Timeouts and timing
         std::chrono::duration<double> local_position_timeout;
@@ -180,8 +182,9 @@ class TrajectoryHandler : public rclcpp::Node
         std::chrono::duration<double> mission_start_receive_timeout;
 
         // Takeoff and Landing parameters
-        trajectory_msgs::msg::JointTrajectoryPoint takeoff_location;
-        
+        bool takeoff_offboard_armed = false;
+        geometry_msgs::msg::Pose takeoff_location;
+        std::vector<_1D::LinearInterpolator<double>> takeoff_interpolators;
 
         // Vehicle State
         rclcpp::Time last_received_vehicle_state;

@@ -3,7 +3,7 @@
 
     <group>
         <push-ros-namespace namespace="$(var vehicle_namespace)"/>
-        <node name="trajectory_handler" pkg="position_trajectory_controller" exec="trajectory_handler" output="screen" respawn="true"/>
+        <node name="trajectory_handler" pkg="position_trajectory_controller" exec="trajectory_handler" output="screen" respawn="true">
             <param name="frame_id" value="map"/>
             <param name="setpoint_frame_id" value="$(var vehicle_namespace)/setpoint"/>
             <param name="vehicle_frame_id" value="$(var vehicle_namespace)/body"/>

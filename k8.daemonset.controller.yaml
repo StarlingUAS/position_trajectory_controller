@@ -30,7 +30,7 @@ spec:
 
       containers:
       - name: position-trajectory-controller
-        image: uobflightlabstarling/position-trajectory-controller
+        image: uobflightlabstarling/position-trajectory-controller:nightly
         imagePullPolicy: Always
         volumeMounts:
         - mountPath: /etc/starling/vehicle.config

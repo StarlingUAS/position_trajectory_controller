@@ -167,6 +167,7 @@ void TrajectoryHandler::reset(){
     this->arming_attempt_start = nullptr;
     this->takeoff_attempt_start = nullptr;
     this->land_attempt_start = nullptr;
+    this->gotostart_attempt_start = nullptr;
 
     // Reset vehicle setpoint to zero
     this->vehicle_setpoint = std::make_shared<geometry_msgs::msg::PoseStamped>();

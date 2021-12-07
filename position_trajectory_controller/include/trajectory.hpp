@@ -62,6 +62,7 @@ class State{
         enum Value: uint8_t {
             INIT,
             TAKEOFF,
+            GOTOSTART,
             LAND,
             STOP,
             EXECUTE,
@@ -91,6 +92,8 @@ class State{
                 return "STATE::INIT";
             case TAKEOFF:
                 return "STATE::TAKEOFF";
+            case GOTOSTART:
+                return "STATE::GOTOSTART";
             case LAND:
                 return "STATE::LAND";
             case STOP:
@@ -126,6 +129,7 @@ class TrajectoryHandler : public rclcpp::Node
         bool smChecks(const rclcpp::Time& stamp);  
         bool smOffboardArmed(const rclcpp::Time& stamp);      
         bool smTakeoffVehicle(const rclcpp::Time& stamp);
+        bool smGoToStart(const rclcpp::Time& stamp);
         bool smLandVehicle(const rclcpp::Time& stamp);
         bool smMakeSafe(const rclcpp::Time& stamp);
         bool smExecuteTrajectory(const rclcpp::Time& stamp);
@@ -137,6 +141,7 @@ class TrajectoryHandler : public rclcpp::Node
         bool vehicleNearLocation(const geometry_msgs::msg::Pose& location);
         void printVehiclePosition();
         void sendSetpointPosition(const rclcpp::Time& stamp, const double x, const double y, const double z, const double yaw=0.0);
+        void sendVehicleSetpointPosition(const rclcpp::Time& stamp);
         void handleLocalPosition(const geometry_msgs::msg::PoseStamped::SharedPtr s);
         double vehicleGetYaw();
 
@@ -163,7 +168,8 @@ class TrajectoryHandler : public rclcpp::Node
         double end_extra_time;                  // Extra time to give after finishing trajectory
         double location_arrival_epsilon;        // Determine if vehicle is near setpoint
         double ground_threshold;                // Below ground threshold indicates that vehicle has landed
-        double takeoff_duration;                // Time given for takeoff to occur
+        double gotostart_duration;                // Time given for takeoff to occur
+        double takeoff_height;                  // Initial takeoff height
 
         // Timeouts and timing
         std::chrono::duration<double> local_position_timeout;
@@ -176,15 +182,17 @@ class TrajectoryHandler : public rclcpp::Node
 
         std::shared_ptr<rclcpp::Time> takeoff_attempt_start;
         std::chrono::duration<double> takeoff_timeout;
+        std::shared_ptr<rclcpp::Time> gotostart_attempt_start;
+        std::chrono::duration<double> gotostart_timeout;
         std::shared_ptr<rclcpp::Time> land_attempt_start;
         std::chrono::duration<double> land_timeout;
 
         std::chrono::duration<double> mission_start_receive_timeout;
 
         // Takeoff and Landing parameters
-        bool takeoff_offboard_armed = false;
         geometry_msgs::msg::Pose takeoff_location;
-        std::vector<_1D::LinearInterpolator<double>> takeoff_interpolators;
+        geometry_msgs::msg::Pose start_location;
+        std::vector<_1D::LinearInterpolator<double>> gotostart_interpolators;
 
         // Vehicle State
         rclcpp::Time last_received_vehicle_state;

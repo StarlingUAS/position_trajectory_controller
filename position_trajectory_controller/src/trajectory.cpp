@@ -82,13 +82,15 @@ TrajectoryHandler::TrajectoryHandler() :
         this->emergency_stop();}, sub_opt);
     
     // Mavros Subscribers
+    rclcpp::SensorDataQoS qos;
+    qos.keep_last(10);
     this->state_sub =   this->create_subscription<mavros_msgs::msg::State>(
-        "mavros/state", 10, [this](const mavros_msgs::msg::State::SharedPtr s){
+        "mavros/state", qos, [this](const mavros_msgs::msg::State::SharedPtr s){
             this->last_received_vehicle_state = this->now(); 
             if(!this->vehicle_state){RCLCPP_INFO(this->get_logger(), "Initial mavros state received"); this->prev_vehicle_state = this->vehicle_state;}
             this->vehicle_state = s;}, sub_opt);
     this->local_position_sub =  this->create_subscription<geometry_msgs::msg::PoseStamped>(
-        "mavros/local_position/pose", 10, 
+        "mavros/local_position/pose", qos, 
         std::bind(&TrajectoryHandler::handleLocalPosition, this, std::placeholders::_1), sub_opt);
 
     // Initialise Publishers
